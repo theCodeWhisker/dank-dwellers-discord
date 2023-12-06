@@ -1,4 +1,8 @@
-require('dotenv').config()
-const { Bot } = require('./models/Bot')
+require("dotenv").config();
+const { Bot } = require("./models/Bot");
 
-const bot = new Bot()
+const bot = new Bot();
+
+module.exports = {
+  bot,
+};
