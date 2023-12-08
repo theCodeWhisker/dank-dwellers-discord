@@ -35,7 +35,7 @@ class Bot extends Client {
 
     this.loadCommands();
 
-    this.on(Events.InteractionCreate, this.onInteractionCreate);
+    this.on(Events.InteractionCreate, this.executeCommand);
   }
 
   loadCommands() {
@@ -66,7 +66,7 @@ class Bot extends Client {
     return this.commands;
   }
 
-  async onInteractionCreate(interaction) {
+  async executeCommand(interaction) {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
@@ -78,6 +78,7 @@ class Bot extends Client {
 
     try {
       await command.execute(interaction);
+      await this.getUser(interaction);
     } catch (error) {
       console.error(error);
       if (interaction.replied || interaction.deferred) {
@@ -94,7 +95,12 @@ class Bot extends Client {
     }
   }
 
-  registerSlashCommands() {}
+  async getUser(interaction) {
+    if (!interaction) return;
+    if (!interaction.member) return;
+
+    return interaction.member;
+  }
 }
 
 module.exports.Bot = Bot;
