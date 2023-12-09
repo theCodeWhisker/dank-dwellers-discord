@@ -12,6 +12,16 @@ const logger = require("../utils/logger");
 class Bot extends Client {
   commands = new Collection();
 
+  static instance;
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new Bot();
+    }
+
+    return this.instance;
+  }
+
   constructor(options = {}) {
     super({
       intents: [
