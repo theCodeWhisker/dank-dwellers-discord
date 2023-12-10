@@ -8,6 +8,10 @@ const {
 const fs = require("node:fs");
 const path = require("node:path");
 const logger = require("../utils/logger");
+const {
+  increaseUserExperience,
+  createUserIfNotExist,
+} = require("../utils/userServices");
 
 class Bot extends Client {
   commands = new Collection();
@@ -80,6 +84,7 @@ class Bot extends Client {
 
   registerEventHandlers() {
     this.on(Events.InteractionCreate, this.handleInteraction);
+    this.on(Events.MessageCreate, this.handleMessage);
   }
 
   get commands() {
@@ -102,6 +107,16 @@ class Bot extends Client {
     } else {
       logger.warn(`No command matching ${interaction.commandName} was found.`);
     }
+  }
+
+  async handleMessage(message) {
+    if (message.author.bot) return;
+    const userId = message.author.id;
+    const guildId = message.guild.id;
+    const username = message.author.username;
+
+    await createUserIfNotExist(userId, username);
+    await increaseUserExperience(userId, guildId, 1);
   }
 
   async getGuildMember(interaction) {

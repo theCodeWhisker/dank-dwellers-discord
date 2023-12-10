@@ -1,2 +1,10 @@
 {"level":"error","message":"test","service":"dank-dwellers-discord","timestamp":"2023-12-09 03:49:52"}
 {"level":"warn","message":"This is a test from our system.","service":"dank-dwellers-discord","timestamp":"2023-12-09 03:50:06"}
+{"level":"info","message":"New user created: codewhisker","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:22:40"}
+{"level":"error","message":"Error in increaseUserExperience: insert or update on table \"experience\" violates foreign key constraint \"experience_guild_id_fkey\"","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:22:40"}
+{"level":"error","message":"Error in createGuildIfNotExist: db is not defined","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:08"}
+{"level":"info","message":"New guild added: monkey.ts's server","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:28"}
+{"level":"info","message":"Experience updated for user 549332783240183818 in guild 1175647368192991302","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:37"}
+{"level":"info","message":"Experience updated for user 549332783240183818 in guild 1175647368192991302","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:39"}
+{"level":"info","message":"Experience updated for user 549332783240183818 in guild 1175647368192991302","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:40"}
+{"level":"info","message":"Experience updated for user 549332783240183818 in guild 1175647368192991302","service":"dank-dwellers-discord","timestamp":"2023-12-09 22:26:41"}
