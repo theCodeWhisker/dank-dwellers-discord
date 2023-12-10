@@ -11,16 +11,7 @@ const logger = require("../utils/logger");
 
 class Bot extends Client {
   commands = new Collection();
-
   static instance;
-
-  static getInstance() {
-    if (!this.instance) {
-      this.instance = new Bot();
-    }
-
-    return this.instance;
-  }
 
   constructor(options = {}) {
     super({
@@ -40,27 +31,50 @@ class Bot extends Client {
     this.registerEventHandlers();
   }
 
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new Bot();
+    }
+
+    return this.instance;
+  }
+
+  async handleError(interaction, error) {
+    logger.error(error);
+
+    if (interaction && !interaction.replied && !interaction.deferred) {
+      await interaction.reply({
+        content: `An unexpected error occured. Please try again later.`,
+        ephemeral: true,
+      });
+    }
+  }
+
   loadCommands() {
     const foldersPath = path.join(process.cwd(), "commands");
     const commandFolders = fs.readdirSync(foldersPath);
 
-    for (const folder of commandFolders) {
-      const commandsPath = path.join(foldersPath, folder);
-      const commandFiles = fs
-        .readdirSync(commandsPath)
-        .filter((file) => file.endsWith(".js"));
-      for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
-        // Set a new item in the Collection with the key as the command name and the value as the exported module
-        if ("data" in command && "execute" in command) {
-          this.commands.set(command.data.name, command);
-        } else {
-          console.log(
-            `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-          );
+    try {
+      for (const folder of commandFolders) {
+        const commandsPath = path.join(foldersPath, folder);
+        const commandFiles = fs
+          .readdirSync(commandsPath)
+          .filter((file) => file.endsWith(".js"));
+        for (const file of commandFiles) {
+          const filePath = path.join(commandsPath, file);
+          const command = require(filePath);
+          // Set a new item in the Collection with the key as the command name and the value as the exported module
+          if ("data" in command && "execute" in command) {
+            this.commands.set(command.data.name, command);
+          } else {
+            logger.error(
+              `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+            );
+          }
         }
       }
+    } catch (error) {
+      logger.error(`Error loading commands: ${error.message}`);
     }
   }
 
@@ -72,31 +86,21 @@ class Bot extends Client {
     return this.commands;
   }
 
-  async handleInteraction(interaction) {
-    const command = interaction.client.commands.get(interaction.commandName);
-
-    if (!command) {
-      console.error(
-        `No command matching ${interaction.commandName} was found.`
-      );
-      return;
-    }
-
+  async executeWithHandling(interaction, command) {
     try {
       await command.execute(interaction);
     } catch (error) {
-      console.error(error);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content: "There was an error while executing this command!",
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content: "There was an error while executing this command!",
-          ephemeral: true,
-        });
-      }
+      this.handleError(interaction, error);
+    }
+  }
+
+  async handleInteraction(interaction) {
+    const command = interaction.client.commands.get(interaction.commandName);
+
+    if (command) {
+      this.executeWithHandling(interaction, command);
+    } else {
+      logger.warn(`No command matching ${interaction.commandName} was found.`);
     }
   }
 
